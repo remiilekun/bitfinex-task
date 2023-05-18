@@ -1,24 +1,54 @@
-import CONFIG from "@/utils/config";
-
 class Socket {
-  constructor() {
-    this.socket = new WebSocket(CONFIG.SOCKET_URL);
+  constructor(url) {
+    this.socket = new WebSocket(url);
+    this.eventListeners = {
+      open: [],
+      message: [],
+      close: [],
+      error: [],
+    };
+
+    this.socket.addEventListener("open", this.handleOpen.bind(this));
+    this.socket.addEventListener("message", this.handleMessage.bind(this));
+    this.socket.addEventListener("close", this.handleClose.bind(this));
+    this.socket.addEventListener("error", this.handleError.bind(this));
   }
 
-  onOpen(callback) {
-    this.socket.addEventListener("open", callback);
+  handleOpen(event) {
+    this.eventListeners.open.forEach((callback) => callback(event));
   }
 
-  onMessage(callback) {
-    this.socket.addEventListener("message", callback);
+  handleMessage(event) {
+    const data = JSON.parse(event.data);
+    this.eventListeners.message.forEach((callback) => callback(data));
   }
 
-  onClose(callback) {
-    this.socket.addEventListener("close", callback);
+  handleClose(event) {
+    this.eventListeners.close.forEach((callback) => callback(event));
   }
 
-  onError(callback) {
-    this.socket.addEventListener("error", callback);
+  handleError(event) {
+    this.eventListeners.error.forEach((callback) => callback(event));
+  }
+
+  on(event, callback) {
+    if (typeof callback !== "function") {
+      throw new Error("Callback must be a function.");
+    }
+
+    if (!this.eventListeners[event]) {
+      throw new Error(`Unsupported event: ${event}`);
+    }
+
+    this.eventListeners[event].push(callback);
+  }
+
+  off(event, callback) {
+    if (this.eventListeners[event]) {
+      this.eventListeners[event] = this.eventListeners[event].filter(
+        (cb) => cb !== callback
+      );
+    }
   }
 
   send(data) {

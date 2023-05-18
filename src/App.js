@@ -1,12 +1,12 @@
 import React from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { Provider } from "react-redux";
 import OrderBookScreen from "@/screens/OrderBookScreen";
 import store from "@/store";
 
 const App = () => {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Provider store={store}>
         <OrderBookScreen />
       </Provider>
@@ -15,3 +15,10 @@ const App = () => {
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#102331",
+  },
+});

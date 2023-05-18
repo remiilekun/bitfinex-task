@@ -2,11 +2,12 @@ import {
   FETCH_ORDER_BOOK_STARTED,
   FETCH_ORDER_BOOK_SUCCEEDED,
   FETCH_ORDER_BOOK_FAILED,
+  UPDATE_ORDER_BOOK_ITEM,
 } from "@/store/types/orderbook";
 
 const initialState = {
   error: null,
-  items: [],
+  items: {},
   loading: false,
 };
 
@@ -32,6 +33,18 @@ export default function todosReducer(state = initialState, action) {
         todos: [],
         loading: false,
         error: action.error,
+      };
+    }
+
+    case UPDATE_ORDER_BOOK_ITEM: {
+      const { key, value } = action;
+
+      return {
+        ...state,
+        items: {
+          ...state.items,
+          [key]: value,
+        },
       };
     }
     default:
