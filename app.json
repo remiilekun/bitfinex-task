@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "bitfinex",
+    "slug": "bitfinex",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
