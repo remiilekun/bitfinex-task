@@ -3,8 +3,10 @@ import { View, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { selectOrderBookItems } from "@/store/selectors/orderbook";
 import { fetchOrderbook } from "@/store/actions/orderbook";
+import { useSocket } from "@/hooks";
 
-const OrderBook = () => {
+const OrderBookScreen = () => {
+  useSocket();
   const dispatch = useDispatch();
   const items = useSelector(selectOrderBookItems);
 
@@ -19,4 +21,4 @@ const OrderBook = () => {
   );
 };
 
-export default OrderBook;
+export default OrderBookScreen;

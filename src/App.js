@@ -1,14 +1,14 @@
 import React from "react";
 import { SafeAreaView } from "react-native";
 import { Provider } from "react-redux";
-import OrderBook from "@/screens/OrderBook";
+import OrderBookScreen from "@/screens/OrderBookScreen";
 import store from "@/store";
 
 const App = () => {
   return (
     <SafeAreaView>
       <Provider store={store}>
-        <OrderBook />
+        <OrderBookScreen />
       </Provider>
     </SafeAreaView>
   );
