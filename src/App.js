@@ -1,23 +1,17 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import CONFIG from "@/utils/config";
+import { SafeAreaView } from "react-native";
+import { Provider } from "react-redux";
+import OrderBook from "@/screens/OrderBook";
+import store from "@/store";
 
-export default function App() {
-  console.log("ln7", CONFIG);
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView>
+      <Provider store={store}>
+        <OrderBook />
+      </Provider>
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+export default App;
