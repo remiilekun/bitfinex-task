@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Socket from "@/services/socket";
 import { updateOrderbookItem } from "@/store/actions/orderbook";
 import CONFIG from "@/utils/config";
 
-export const useSocket = () => {
+export const useOrderbookSocket = () => {
   const dispatch = useDispatch();
+  const precision = useSelector((state) => state.orderbook.precision);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -26,10 +27,11 @@ export const useSocket = () => {
     const handleSocketOpen = () => {
       setIsConnected(true);
       socket.send({
-        event: "subscribe",
         channel: "book",
-        symbol: "tBTCUSD",
+        event: "subscribe",
         freq: "F1",
+        prec: `P${precision}`,
+        symbol: "tBTCUSD",
       });
     };
 
@@ -38,6 +40,8 @@ export const useSocket = () => {
       socket.send({
         event: "unsubscribe",
         channel: "book",
+        freq: "F1",
+        prec: `P${precision}`,
         symbol: "tBTCUSD",
       });
     };
@@ -58,9 +62,9 @@ export const useSocket = () => {
     return () => {
       socket.close();
     };
-  }, [dispatch]);
+  }, [dispatch, precision]);
 
   return isConnected;
 };
 
-export default useSocket;
+export default useOrderbookSocket;

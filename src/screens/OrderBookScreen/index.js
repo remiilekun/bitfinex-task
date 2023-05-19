@@ -1,26 +1,44 @@
 import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { selectOrderBookItems } from "@/store/selectors/orderbook";
 import { fetchOrderbook } from "@/store/actions/orderbook";
-import { useSocket } from "@/hooks";
-import styles from "./styles";
+import { useOrderbookSocket } from "@/hooks";
 import OrderBookTable from "@/components/OrderBookTable";
+import PrecisionSwitcher from "@/components/PrecisionSwitcher";
+import styles from "./styles";
 
 const OrderBookScreen = () => {
-  useSocket();
+  useOrderbookSocket();
   const dispatch = useDispatch();
-  const items = useSelector(selectOrderBookItems);
+
+  const { loading, items, precision } = useSelector((state) => ({
+    loading: state.orderbook.loading,
+    items: state.orderbook.items,
+    precision: state.orderbook.precision,
+  }));
 
   useEffect(() => {
-    dispatch(fetchOrderbook());
-  }, [dispatch]);
+    dispatch(
+      fetchOrderbook({
+        pair: "tBTCUSD",
+        precision: "P0",
+        precision: `P${precision}`,
+      })
+    );
+  }, [dispatch, precision]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ORDER BOOK</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>ORDER BOOK</Text>
+        <PrecisionSwitcher />
+      </View>
 
-      <OrderBookTable items={Object.values(items)} />
+      {loading ? (
+        <ActivityIndicator size="large" color="#fff" />
+      ) : (
+        <OrderBookTable items={Object.values(items)} />
+      )}
     </View>
   );
 };

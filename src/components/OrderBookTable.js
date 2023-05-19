@@ -24,7 +24,6 @@ const OrderBookTable = ({ items }) => {
 export default OrderBookTable;
 
 const styles = StyleSheet.create({
-  container: {},
   row: {
     flexDirection: "row",
     alignItems: "center",
