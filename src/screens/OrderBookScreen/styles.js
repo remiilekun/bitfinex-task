@@ -5,14 +5,27 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    flexDirection: "row",
     alignItems: "center",
+    flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  headerActions: {
+    alignItems: "center",
+    flexDirection: "row",
   },
   title: {
     color: "white",
     fontSize: 24,
-    marginBottom: 10,
+  },
+  switcherContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+    marginRight: 10,
+  },
+  switcherText: {
+    marginRight: 8,
+    color: "#fff",
   },
 });
 

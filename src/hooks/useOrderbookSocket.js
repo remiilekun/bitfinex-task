@@ -8,8 +8,8 @@ import CONFIG from "@/utils/config";
 export const useOrderbookSocket = () => {
   const dispatch = useDispatch();
   const socketRef = useRef(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [isNetworkAvailable, setIsNetworkAvailable] = useState(true);
+  const [isSocketEnabled, setIsSocketEnabled] = useState(true);
   const precision = useSelector((state) => state.orderbook.precision);
 
   const handleSocketMessage = (data) => {
@@ -21,7 +21,6 @@ export const useOrderbookSocket = () => {
   };
 
   const handleSocketOpen = () => {
-    setIsConnected(true);
     socketRef.current.send({
       channel: "book",
       event: "subscribe",
@@ -32,7 +31,7 @@ export const useOrderbookSocket = () => {
   };
 
   const handleSocketClose = () => {
-    setIsConnected(false);
+    console.log("Socket closed");
   };
 
   const handleSocketError = (error) => {
@@ -56,17 +55,30 @@ export const useOrderbookSocket = () => {
       setIsNetworkAvailable(state.isConnected);
     });
 
-    if (isNetworkAvailable && !socketRef.current?.isConnected()) {
+    if (
+      isNetworkAvailable &&
+      isSocketEnabled &&
+      !socketRef.current?.isConnected()
+    ) {
       connectSocket();
+    } else if (
+      (!isNetworkAvailable || !isSocketEnabled) &&
+      socketRef.current?.isConnected()
+    ) {
+      socketRef.current.close();
     }
 
     return () => {
       socketRef.current.close();
       unsubscribeNetworkListener();
     };
-  }, [dispatch, precision, isNetworkAvailable]);
+  }, [dispatch, precision, isNetworkAvailable, isSocketEnabled]);
 
-  return isConnected;
+  const toggleSocket = () => {
+    setIsSocketEnabled((prevEnabled) => !prevEnabled);
+  };
+
+  return { toggleSocket, isEnabled: isSocketEnabled };
 };
 
 export default useOrderbookSocket;

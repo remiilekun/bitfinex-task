@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    padding: 10,
+    paddingHorizontal: 10,
   },
   text: {
     color: "white",

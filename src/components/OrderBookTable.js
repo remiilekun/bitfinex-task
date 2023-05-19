@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 const OrderBookTable = ({ items }) => {
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.row}>
         <Text style={styles.col}>Price</Text>
         <Text style={styles.col}>Count</Text>
@@ -24,6 +24,9 @@ const OrderBookTable = ({ items }) => {
 export default OrderBookTable;
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    paddingBottom: 30,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
