@@ -37,7 +37,7 @@ const OrderBookScreen = () => {
               {isEnabled ? "Realtime" : "Static"}
             </Text>
             <Switch
-              onChange={toggleSocket}
+              onValueChange={toggleSocket}
               style={styles.switcher}
               thumbColor={isEnabled ? "#102331" : "#f4f3f4"}
               trackColor={{ false: "#767577", true: "#81b0ff" }}
