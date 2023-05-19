@@ -43,6 +43,10 @@ class Socket {
     this.eventListeners[event].push(callback);
   }
 
+  isConnected() {
+    return this.socket.readyState === WebSocket.OPEN;
+  }
+
   off(event, callback) {
     if (this.eventListeners[event]) {
       this.eventListeners[event] = this.eventListeners[event].filter(

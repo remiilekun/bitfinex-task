@@ -1,68 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import NetInfo from "@react-native-community/netinfo";
 import Socket from "@/services/socket";
 import { updateOrderbookItem } from "@/store/actions/orderbook";
 import CONFIG from "@/utils/config";
 
 export const useOrderbookSocket = () => {
   const dispatch = useDispatch();
-  const precision = useSelector((state) => state.orderbook.precision);
+  const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isNetworkAvailable, setIsNetworkAvailable] = useState(true);
+  const precision = useSelector((state) => state.orderbook.precision);
+
+  const handleSocketMessage = (data) => {
+    if (Array.isArray(data) && Array.isArray(data[1]) && data[1].length === 3) {
+      const payload = data[1];
+      const [key] = payload;
+      dispatch(updateOrderbookItem(key, payload));
+    }
+  };
+
+  const handleSocketOpen = () => {
+    setIsConnected(true);
+    socketRef.current.send({
+      channel: "book",
+      event: "subscribe",
+      freq: "F1",
+      prec: `P${precision}`,
+      symbol: "tBTCUSD",
+    });
+  };
+
+  const handleSocketClose = () => {
+    setIsConnected(false);
+  };
+
+  const handleSocketError = (error) => {
+    console.error("Socket error:", error);
+  };
+
+  const handleSocketMessageEvent = (data) => {
+    handleSocketMessage(data);
+  };
+
+  const connectSocket = () => {
+    socketRef.current = new Socket(CONFIG.SOCKET_URL);
+    socketRef.current.on("open", handleSocketOpen);
+    socketRef.current.on("close", handleSocketClose);
+    socketRef.current.on("error", handleSocketError);
+    socketRef.current.on("message", handleSocketMessageEvent);
+  };
 
   useEffect(() => {
-    const socket = new Socket(CONFIG.SOCKET_URL);
+    const unsubscribeNetworkListener = NetInfo.addEventListener((state) => {
+      setIsNetworkAvailable(state.isConnected);
+    });
 
-    const handleSocketMessage = (data) => {
-      if (
-        Array.isArray(data) &&
-        Array.isArray(data[1]) &&
-        data[1].length === 3
-      ) {
-        const payload = data[1];
-        const [key] = payload;
-        dispatch(updateOrderbookItem(key, payload));
-      }
-    };
-
-    const handleSocketOpen = () => {
-      setIsConnected(true);
-      socket.send({
-        channel: "book",
-        event: "subscribe",
-        freq: "F1",
-        prec: `P${precision}`,
-        symbol: "tBTCUSD",
-      });
-    };
-
-    const handleSocketClose = () => {
-      setIsConnected(false);
-      socket.send({
-        event: "unsubscribe",
-        channel: "book",
-        freq: "F1",
-        prec: `P${precision}`,
-        symbol: "tBTCUSD",
-      });
-    };
-
-    const handleSocketError = (error) => {
-      console.error("Socket error:", error);
-    };
-
-    const handleSocketMessageEvent = (data) => {
-      handleSocketMessage(data);
-    };
-
-    socket.on("open", handleSocketOpen);
-    socket.on("close", handleSocketClose);
-    socket.on("error", handleSocketError);
-    socket.on("message", handleSocketMessageEvent);
+    if (isNetworkAvailable && !socketRef.current?.isConnected()) {
+      connectSocket();
+    }
 
     return () => {
-      socket.close();
+      socketRef.current.close();
+      unsubscribeNetworkListener();
     };
-  }, [dispatch, precision]);
+  }, [dispatch, precision, isNetworkAvailable]);
 
   return isConnected;
 };
